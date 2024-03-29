@@ -4,6 +4,6 @@
 
     <include file="$(find diadem_mini_firmware)/launch/bringup.launch" />   
     <include file="$(find diadem_mini_odometry)/launch/carto_odometry.launch" />
-    <include file="$(find diadem_mini_navigation)/launch/diadem_mini_carto_navigation.launch" /> 
+    <include file="$(find diadem_mini_navigation)/launch/carto_navigation.launch" /> 
   
 </launch>

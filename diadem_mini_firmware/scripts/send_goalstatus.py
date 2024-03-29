@@ -11,7 +11,7 @@ class GoalStatusPublisher:
         rospy.init_node('goal_status_publisher', anonymous=True)
 
         # Define publishers
-        self.goal_status_pub = rospy.Publisher('robot/status', Int32, queue_size=10)
+        self.goal_status_pub = rospy.Publisher('robot/nav_status', Int32, queue_size=10)
 
         # Define subscribers
         rospy.Subscriber('move_base/goal', MoveBaseActionGoal, self.goal_received_callback)

@@ -19,7 +19,7 @@
         <param name="baud" type="int" value="921600" />
     </node>
     <group if="$(arg joy)">
-        <include file="$(find diadem_mini_firmware)/launch/cepheus_joy.launch" />
+        <include file="$(find diadem_mini_firmware)/launch/diadem_mini_joy.launch" />
     </group>
 
 </launch>

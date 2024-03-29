@@ -85,7 +85,7 @@ some_ip_address = "  Fetching IP  "
 
 def get_ip_address():
     global counter,some_ip_address
-    json_data = rospy.Publisher('/network_status', String, queue_size=10)
+    json_data = rospy.Publisher('robot/network_status', String, queue_size=10)
     rospy.init_node('network_status', anonymous=True)
     rate = rospy.Rate(1)
     connection = connection_type()
