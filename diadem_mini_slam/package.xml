@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>diadem_mini_slam</name>
+  <version>0.0.0</version>
+  <description>The diadem_mini_slam package</description>
+
+  <maintainer email="kartiksoni@rigbetellabs.com">Kartik Soni</maintainer>
+
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>cartographer_ros</depend>
+  <depend>gmapping</depend>
+  <depend>map_server</depend>
+  <depend>roscpp</depend>
+  <depend>rospy</depend>
+  <depend>rviz</depend>
+  <depend>std_msgs</depend>
+  <exec_depend>diadem_mini_navigation</exec_depend>
+
+</package>

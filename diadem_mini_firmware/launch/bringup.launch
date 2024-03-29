@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="joy" default="true" />
+
+    <param command="$(find xacro)/xacro $(find diadem_mini_description)/urdf/diadem_mini.xacro"
+        name="robot_description" />
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+
+    <node name="network_data" pkg="diadem_mini_firmware" type="network_pub.py" />
+
+    <include file="$(find diadem_mini_firmware)/launch/rplidar_a3.launch" />
+
+    <node name="serial_node" pkg="rosserial_python" type="serial_node.py" output="screen">
+        <param name="port" type="string" value="/dev/esp" />
+        <param name="baud" type="int" value="921600" />
+    </node>
+    <group if="$(arg joy)">
+        <include file="$(find diadem_mini_firmware)/launch/cepheus_joy.launch" />
+    </group>
+
+</launch>
