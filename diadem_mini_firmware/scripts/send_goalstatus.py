@@ -12,6 +12,7 @@ class GoalStatusPublisher:
 
         # Define publishers
         self.goal_status_pub = rospy.Publisher('robot/nav_status', Int32, queue_size=10)
+        self.goal_count =0
 
         # Define subscribers
         rospy.Subscriber('move_base/goal', MoveBaseActionGoal, self.goal_received_callback)
@@ -22,13 +23,20 @@ class GoalStatusPublisher:
     def goal_received_callback(self, msg):
         # Callback when a new move base goal is received
         self.publish_goal_status(1)
+        self.goal_count+=1
 
     def goal_result_callback(self, msg):
         # Callback when the goal is reached
         if msg.status.status == 3:  # SUCCEEDED status
             self.publish_goal_status(2)
+            self.goal_count=0
+            
         elif msg.status.status in [2, 4, 5]:  # Cancelled status
-            self.publish_goal_status(3)
+            if self.goal_count>1:
+                pass
+            else:
+                self.publish_goal_status(3)
+                self.goal_count=0
 
 
     def publish_goal_status(self, status):
