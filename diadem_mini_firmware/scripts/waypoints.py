@@ -6,6 +6,7 @@ from actionlib_msgs.msg import GoalStatus
 from geometry_msgs.msg import Point
 import pandas as pd
 import os, rospkg
+import time
 rospack = rospkg.RosPack()
 
 # this method will make the robot move to the goal location
@@ -33,10 +34,11 @@ def move_to_goal(xGoal, yGoal, zGoal, XGoal, YGoal, ZGoal, WGoal):
     rospy.loginfo("Sending goal location ...")
     ac.send_goal(goal)
 
-    ac.wait_for_result(rospy.Duration(100))
+    ac.wait_for_result(rospy.Duration(200))
 
     if ac.get_state() == GoalStatus.SUCCEEDED:
         rospy.loginfo("You have reached the destination")
+        time.sleep(5)
         return True
     else:
         rospy.loginfo("The robot failed to reach the destination")
@@ -61,7 +63,7 @@ def read_csv_publish_goal():
             if i == (store_len - 1):
                 i = 0
 
-if _name_ == '_main_':
+if __name__ == '__main__':
     rospy.init_node('csv_to_goal_publisher', anonymous=True)
     read_csv_publish_goal()
     rospy.spin()
