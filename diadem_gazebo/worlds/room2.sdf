@@ -1,0 +1,306 @@
+<?xml version="1.0" ?>
+<!--
+  room2.sdf  –  Gazebo Sim (Modern) world
+  ---------------------------------------------------------------
+  Key changes from Gazebo Classic:
+    • sdf version bumped to 1.8
+    • <physics> block uses modern ODE parameters
+    • <plugin> system entries use modern gz naming
+    • <gui> block updated to use Gazebo Sim gui components
+    • All geometry / wall / obstacle models kept identical
+-->
+<sdf version='1.8'>
+  <world name='default'>
+
+    <!-- ============================================================
+         REQUIRED IGNITION SYSTEM PLUGINS
+         ============================================================ -->
+
+    <!-- Core physics -->
+    <plugin
+        filename="gz-sim-physics-system"
+        name="gz::sim::systems::Physics">
+    </plugin>
+
+    <!-- Allows the GUI / ROS nodes to move models, apply forces, etc. -->
+    <plugin
+        filename="gz-sim-user-commands-system"
+        name="gz::sim::systems::UserCommands">
+    </plugin>
+
+    <!-- Broadcasts scene state to GUI -->
+    <plugin
+        filename="gz-sim-scene-broadcaster-system"
+        name="gz::sim::systems::SceneBroadcaster">
+    </plugin>
+
+    <!-- Required for any sensor (lidar, camera, IMU …) to work -->
+    <plugin
+        filename="gz-sim-sensors-system"
+        name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+
+    <!-- IMU system (needed even if you only use the URDF IMU sensor) -->
+    <plugin
+        filename="gz-sim-imu-system"
+        name="gz::sim::systems::Imu">
+    </plugin>
+
+    <!-- ============================================================
+         LIGHTING
+         ============================================================ -->
+    <light name='sun' type='directional'>
+      <cast_shadows>1</cast_shadows>
+      <pose>0 0 10 0 -0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <!-- ============================================================
+         GROUND PLANE
+         ============================================================ -->
+    <model name='ground_plane'>
+      <static>1</static>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>100</mu>
+                <mu2>50</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <cast_shadows>0</cast_shadows>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.8 0.8 0.8 1</ambient>
+            <diffuse>0.8 0.8 0.8 1</diffuse>
+            <specular>0.8 0.8 0.8 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ============================================================
+         PHYSICS
+         ============================================================ -->
+    <physics name='default_physics' default='0' type='ode'>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+
+    <!-- ============================================================
+         ROOM WALLS  (copied from original room2.sdf – geometry unchanged)
+         ============================================================ -->
+    <model name='room_walls'>
+      <static>true</static>
+      <pose>0 0 0 0 0 0</pose>
+
+      <!-- Wall 1 – south -->
+      <link name='Wall_1'>
+        <pose>0 -5 0 0 0 0</pose>
+        <collision name='Wall_1_Collision'>
+          <geometry><box><size>10 0.15 2.5</size></box></geometry>
+          <pose>0 0 1.25 0 0 0</pose>
+        </collision>
+        <visual name='Wall_1_Visual'>
+          <pose>0 0 1.25 0 0 0</pose>
+          <geometry><box><size>10 0.15 2.5</size></box></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+
+      <!-- Wall 2 – north -->
+      <link name='Wall_2'>
+        <pose>0 5 0 0 0 0</pose>
+        <collision name='Wall_2_Collision'>
+          <geometry><box><size>10 0.15 2.5</size></box></geometry>
+          <pose>0 0 1.25 0 0 0</pose>
+        </collision>
+        <visual name='Wall_2_Visual'>
+          <pose>0 0 1.25 0 0 0</pose>
+          <geometry><box><size>10 0.15 2.5</size></box></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+
+      <!-- Wall 3 – west -->
+      <link name='Wall_3'>
+        <pose>-5 0 0 0 0 1.5708</pose>
+        <collision name='Wall_3_Collision'>
+          <geometry><box><size>10 0.15 2.5</size></box></geometry>
+          <pose>0 0 1.25 0 0 0</pose>
+        </collision>
+        <visual name='Wall_3_Visual'>
+          <pose>0 0 1.25 0 0 0</pose>
+          <geometry><box><size>10 0.15 2.5</size></box></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+
+      <!-- Wall 4 – east -->
+      <link name='Wall_4'>
+        <pose>5 0 0 0 0 1.5708</pose>
+        <collision name='Wall_4_Collision'>
+          <geometry><box><size>10 0.15 2.5</size></box></geometry>
+          <pose>0 0 1.25 0 0 0</pose>
+        </collision>
+        <visual name='Wall_4_Visual'>
+          <pose>0 0 1.25 0 0 0</pose>
+          <geometry><box><size>10 0.15 2.5</size></box></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ============================================================
+         OBSTACLES  (boxes + cylinder from original world)
+         ============================================================ -->
+    <model name='unit_box'>
+      <pose>2.59462 1.17635 0.5 0 0 0</pose>
+      <static>false</static>
+      <link name='link'>
+        <inertial><mass>1.0</mass></inertial>
+        <collision name='collision'>
+          <geometry><box><size>1 1 1</size></box></geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry><box><size>1 1 1</size></box></geometry>
+          <material>
+            <ambient>0.3 0.3 0.8 1</ambient>
+            <diffuse>0.3 0.3 0.8 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='unit_box_0'>
+      <pose>6.02233 7.8534 0.5 0 0 0</pose>
+      <static>false</static>
+      <link name='link'>
+        <inertial><mass>1.0</mass></inertial>
+        <collision name='collision'>
+          <geometry><box><size>1 1 1</size></box></geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry><box><size>1 1 1</size></box></geometry>
+          <material>
+            <ambient>0.3 0.3 0.8 1</ambient>
+            <diffuse>0.3 0.3 0.8 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='unit_cylinder'>
+      <pose>2.60683 8.02008 0.5 0 0 0</pose>
+      <static>false</static>
+      <link name='link'>
+        <inertial><mass>1.0</mass></inertial>
+        <collision name='collision'>
+          <geometry><cylinder><radius>0.5</radius><length>1.0</length></cylinder></geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry><cylinder><radius>0.5</radius><length>1.0</length></cylinder></geometry>
+          <material>
+            <ambient>0.8 0.3 0.3 1</ambient>
+            <diffuse>0.8 0.3 0.3 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ============================================================
+         GUI
+         In Ignition Fortress the GUI camera is configured differently.
+         ============================================================ -->
+    <gui fullscreen="0">
+      <plugin filename="GzScene3D" name="3D View">
+        <gz-gui>
+          <title>3D View</title>
+          <property type="bool" key="showTitleBar">false</property>
+          <property type="string" key="state">docked</property>
+        </gz-gui>
+        <engine>ogre2</engine>
+        <scene>scene</scene>
+        <ambient_light>0.4 0.4 0.4</ambient_light>
+        <background_color>0.8 0.8 0.8</background_color>
+        <camera_pose>0.78 4.87 30.47 0 1.51 1.36</camera_pose>
+      </plugin>
+
+      <plugin filename="WorldControl" name="World control">
+        <gz-gui>
+          <title>World control</title>
+          <property type="bool" key="showTitleBar">false</property>
+          <property type="bool" key="resizable">false</property>
+          <property type="double" key="height">72</property>
+          <property type="double" key="z">1</property>
+          <property type="string" key="state">floating</property>
+          <anchors target="3D View">
+            <line own="left" target="left"/>
+            <line own="bottom" target="bottom"/>
+          </anchors>
+        </gz-gui>
+        <play_pause>true</play_pause>
+        <step>true</step>
+        <start_paused>false</start_paused>
+      </plugin>
+
+      <plugin filename="WorldStats" name="World stats">
+        <gz-gui>
+          <title>World stats</title>
+          <property type="bool" key="showTitleBar">false</property>
+          <property type="bool" key="resizable">false</property>
+          <property type="double" key="height">110</property>
+          <property type="double" key="width">290</property>
+          <property type="double" key="z">1</property>
+          <property type="string" key="state">floating</property>
+          <anchors target="3D View">
+            <line own="right" target="right"/>
+            <line own="bottom" target="bottom"/>
+          </anchors>
+        </gz-gui>
+        <sim_time>true</sim_time>
+        <real_time>true</real_time>
+        <real_time_factor>true</real_time_factor>
+        <iterations>true</iterations>
+      </plugin>
+    </gui>
+
+  </world>
+</sdf>
