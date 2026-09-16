@@ -9,10 +9,25 @@ import launch_ros
 def generate_launch_description():
     pkg_share = launch_ros.substitutions.FindPackageShare(
         package='diadem_gazebo').find('diadem_gazebo')
+    desc_pkg_share = launch_ros.substitutions.FindPackageShare(
+        package='diadem_description').find('diadem_description')
 
     worlds_dir = os.path.join(pkg_share, 'worlds')
+    models_dir = os.path.join(pkg_share, 'models')
     gz_bridge_core_config = os.path.join(pkg_share, 'config', 'gz_bridge_core.yaml')
     gz_bridge_scan_config = os.path.join(pkg_share, 'config', 'gz_bridge_scan.yaml')
+
+    gz_resource_paths = [
+        os.path.dirname(desc_pkg_share),
+        os.path.dirname(pkg_share),
+        worlds_dir,
+        models_dir,
+    ]
+    if 'GZ_SIM_RESOURCE_PATH' in os.environ and os.environ['GZ_SIM_RESOURCE_PATH']:
+        gz_resource_paths.append(os.environ['GZ_SIM_RESOURCE_PATH'])
+    if 'IGN_GAZEBO_RESOURCE_PATH' in os.environ and os.environ['IGN_GAZEBO_RESOURCE_PATH']:
+        gz_resource_paths.append(os.environ['IGN_GAZEBO_RESOURCE_PATH'])
+    gz_resource_path = ':'.join([p for p in gz_resource_paths if os.path.exists(p)])
 
     use_sim_time = LaunchConfiguration('use_sim_time')
     headless = LaunchConfiguration('headless')
@@ -34,7 +49,11 @@ def generate_launch_description():
         
         return [ExecuteProcess(
             cmd=cmd,
-            output='screen'
+            output='screen',
+            additional_env={
+                'GZ_SIM_RESOURCE_PATH': gz_resource_path,
+                'IGN_GAZEBO_RESOURCE_PATH': gz_resource_path,
+            }
         )]
 
     gz_sim = OpaqueFunction(function=resolve_world_path)
@@ -76,8 +95,9 @@ def generate_launch_description():
             description='World file name (relative to worlds/) or absolute path. '
                         'Options: nav2_test_world.sdf | open_field.sdf | room2.sdf'
         ),
-        # Make all local .sdf/.world files discoverable by gz sim (Harmonic/Jazzy)
-        SetEnvironmentVariable('GZ_SIM_RESOURCE_PATH', worlds_dir),
+        # Make all local .sdf/.world files and package meshes discoverable by gz sim (Harmonic/Jazzy)
+        SetEnvironmentVariable('GZ_SIM_RESOURCE_PATH', gz_resource_path),
+        SetEnvironmentVariable('IGN_GAZEBO_RESOURCE_PATH', gz_resource_path),
         gz_sim,
         gz_bridge_core,
         gz_bridge_scan,

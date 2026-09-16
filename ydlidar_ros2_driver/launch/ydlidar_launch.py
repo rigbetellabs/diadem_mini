@@ -51,19 +51,26 @@ def generate_launch_description():
                     )
 
     # Laser filter node: removes ghost points from gaps/doorways
-    # Subscribes to /scan, publishes clean data to /scan_filtered
-    # Point your navigation stack at /scan_filtered instead of /scan
-    filter_config = os.path.join(share_dir, 'params', 'laser_filter.yaml')
+    # Subscribes: /scan (Best Effort), Publishes: /scan_filtered (Best Effort)
     laser_filter_node = Node(
-        package='laser_filters',
-        executable='scan_to_scan_filter_chain',
-        name='laser_filter',
+        package='ydlidar_ros2_driver',
+        executable='scan_filter_node',
+        name='scan_filter',
         output='screen',
-        parameters=[{'params_file': filter_config}],
-        remappings=[
-            ('scan',          '/scan'),
-            ('scan_filtered', '/scan_filtered'),
-        ],
+        parameters=[{
+            'range_min':        0.15,
+            'range_max':        10.0,
+            'chassis_x_min':   -0.45,
+            'chassis_x_max':    0.45,
+            'chassis_y_min':   -0.45,
+            'chassis_y_max':    0.45,
+            'chassis_radius':   0.0,
+            'lidar_offset_x':   0.0,
+            'lidar_offset_y':   0.0,
+            'jump_window':      8,
+            'jump_thresh':      0.15,
+            'min_cluster_rays': 25,
+        }],
     )
 
     return LaunchDescription([

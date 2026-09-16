@@ -1,22 +1,22 @@
 
-# Diadem Pixhawk Release
+# Diadem Mini Pixhawk Release
 ## ROS2 Jazzy Release
 
-![diadem Logo](https://github.com/rigbetellabs/rbl_docs/blob/main/img/logo.png)
+![Diadem Mini Logo](https://github.com/rigbetellabs/rbl_docs/blob/main/img/logo.png)
 
 <div align="center">
 
-Welcome to the official public repository for **Diadem** by **RigBetel Labs**.
+Welcome to the official public repository for **Diadem Mini** by **RigBetel Labs**.
 
 **Purpose:**  
-This repository hosts essential documentation and code for *Diadem Robot*, facilitating transparency and collaboration.
+This repository hosts essential documentation and code for *Diadem Mini Robot*, facilitating transparency and collaboration.
 
 **Privacy:**  
 Certain sensitive packages and scripts have been excluded to maintain privacy standards.
 
 **Contents:**  
 - **Documentation:** Detailed guides and technical specifications.
-- **Codebase:** Essential source code for *Diadem Robot*.
+- **Codebase:** Essential source code for *Diadem Mini Robot*.
 - **Resources:** Supplementary materials and dependencies.
 
 
@@ -53,10 +53,11 @@ For inquiries and collaboration opportunities, reach out to RigBetel Labs.
       - [**Custom PID Mode ⚠️**](#custom-pid-mode-%EF%B8%8F)
   - [**3.4 ROS-based Teleoperation Mode**](#34-ros-based-teleoperation-mode)
   - [**3.5 ROS-based Pixhawk Control Mode**](#35-ros-based-pixhawk-control-mode)
-  - [**3.6 USB Port Configuration**](#36-usb-port-configuration)
-  - [**3.7 Get IP Address of Robot**](#37-get-ip-address-of-robot)
+  - [**3.6 Pixhawk Obstacle Proximity with Intel RealSense D435i (vision_to_mavros)**](#36-pixhawk-obstacle-proximity-with-intel-realsense-d435i-vision_to_mavros)
+  - [**3.7 USB Ports Configuration**](#37-usb-ports-configuration)
+  - [**3.8 Get IP Address of Robot**](#38-get-ip-address-of-robot)
 - [**5. Features via ROS Topics**](#5-features-via-ros-topics)
-- [**6. Diadem Robot Parameters**](#6-diadem-robot-parameters)
+- [**6. Diadem Mini Robot Parameters**](#6-diadem-mini-robot-parameters)
 - [**7. Diagnostic Tests**](#7-diagnostic-tests)
    - [**Overview**](#overview)
    - [**Instructions**](#instructions)
@@ -92,12 +93,12 @@ Provides sensor and actuation topics.
 | [micro_ros.launch.py](https://github.com/rigbetellabs/diadem/blob/ros2-jazzy/diadem_firmware/launch/micro_ros.launch.py)           | Launches micro-ROS Agent for ESP32 microcontroller communication.                                                                      | micro_ros_agent                          |
 
 ### 1.3 diadem_gazebo
-Simulation environment for Diadem in Gazebo Sim (Harmonic).
+Simulation environment for Diadem Mini in Gazebo Sim (Harmonic).
 
 | File                | Description                                             | Nodes Launched                |
 |---------------------|---------------------------------------------------------|-------------------------------|
 |  [gazebo.launch.py](https://github.com/rigbetellabs/diadem/blob/ros2-jazzy/diadem_gazebo/launch/gazebo.launch.py)      | Launches a Gazebo Sim environment with a specified world, along with ros_gz_bridge nodes.                                    | gz_sim, ros_gz_bridge (core, scan)                                         |
-|  [spawn_robot.launch.py](https://github.com/rigbetellabs/diadem/blob/ros2-jazzy/diadem_gazebo/launch/spawn_robot.launch.py) | Launches Gazebo Sim, spawns the Diadem robot model, and connects ros_gz_bridge. | gz_sim create, robot_state_publisher, ros_gz_bridge |
+|  [spawn_robot.launch.py](https://github.com/rigbetellabs/diadem/blob/ros2-jazzy/diadem_gazebo/launch/spawn_robot.launch.py) | Launches Gazebo Sim, spawns the Diadem Mini robot model, and connects ros_gz_bridge. | gz_sim create, robot_state_publisher, ros_gz_bridge |
 
 ### 1.4 diadem_bringup
 Complete bringup orchestration for both simulation and real hardware.
@@ -133,22 +134,22 @@ For simulation, below process needs to be done in laptop/PC with ROS 2 Jazzy and
 
 Clone the diadem repository into your workspace:
 ```bash
-cd ~/ros2_ws/src  # Assuming ros2_ws is the name of the workspace
+cd ~/diadem_ws/src  # Assuming diadem_ws is the name of the workspace
 git clone -b ros2-jazzy https://github.com/rigbetellabs/diadem.git
 ```
 
 Install dependent packages:
 
 ```bash
-cd ~/ros2_ws/src/diadem
+cd ~/diadem_ws/src/diadem
 cat requirements.txt | xargs sudo apt-get install -y 
 ```
 
 Build the workspace:
 
 ```bash
-cd ~/ros2_ws
-colcon build --symlink-install
+cd ~/diadem_ws
+colcon build
 ```  
 
 To launch Gazebo simulation:
@@ -248,16 +249,16 @@ There are two modes of robot
 By default, the robot is configured to start automatically in Demo Mode, running ROS without requiring a Wi-Fi network. To start the robot in Demo Mode (i.e., to automatically launch the desired ROS processes on boot), use the following command:
 ```bash
 # For going into demo mode
-cd ros2_ws/src/diadem
+cd diadem_ws/src/diadem
 ./demo.sh
 ```
 
 #### 2. Development Mode - No ROS2 nodes are launched during startup.
 > [!NOTE]
-To switch to Development Mode, which will prevent any ROS processes from starting automatically, allowing you to test your launch files, SSH into the robot and execute the necessary commands to disable automatic startup.
+> To switch to Development Mode, which will prevent any ROS processes from starting automatically, allowing you to test your launch files, SSH into the robot and execute the necessary commands to disable automatic startup.
 ```bash
 # For going into Development mode
-cd ros2_ws/src/diadem
+cd diadem_ws/src/diadem
 ./development.sh
 ```
 
@@ -362,7 +363,7 @@ Download the app from [here](https://docs.qgroundcontrol.com/master/en/qgc-user-
 #### 4. Provide IP Addresses
 
 > [!IMPORTANT]
-> Enter the IP address of the robot. [How to obtain IP?](#9-get-ip-address-of-robot)
+> Enter the IP address of the robot. [How to obtain IP?](#38-get-ip-address-of-robot)
 
 <p align="center">
 <img src="https://github.com/rigbetellabs/rbl_docs/blob/main/img/qgc3.gif" width="400"/>
@@ -390,16 +391,77 @@ We have provided the API Script along with the package to enable the GPS navigat
 [Link to Documentation](https://github.com/rigbetellabs/diadem/blob/ros2-jazzy/diadem_firmware/scripts/readme.md)
 
 > [!IMPORTANT]
-> To enable Obstacle avoidance in GPS navigation using Realsense d435i, follow the instructions provided [here](https://ardupilot.org/copter/docs/common-realsense-depth-camera.html)
+> To enable Obstacle avoidance in GPS navigation using Realsense d435i, follow the instructions provided [here](https://ardupilot.org/copter/docs/common-realsense-depth-camera.html) and in the subsection below.
 
-### 3.6 USB Ports Configuration
+### 3.6 Pixhawk Obstacle Proximity with Intel RealSense D435i (`vision_to_mavros`)
+
+For autonomous obstacle avoidance and proximity detection in Pixhawk / ArduPilot during GPS navigation, the Intel RealSense D435i depth stream is converted into MAVLink `OBSTACLE_DISTANCE` messages using `d4xx_to_mavlink.py` (located in `vision_to_mavros/scripts/`).
+
+Because this pipeline requires specialized Python libraries (`pyrealsense2`, `pymavlink`, etc.), it runs in a dedicated Python virtual environment (`d4xx_venv`). This allows it to run **concurrently** with ROS 2 and autobringup without dependency conflicts.
+
+#### 1. Setup the `d4xx_venv` Virtual Environment
+
+Install required system packages:
+```bash
+sudo apt update
+sudo apt install -y python3-venv python3-pip python3-gst-1.0 gir1.2-gst-rtsp-server-1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-ugly libx264-dev
+```
+
+Create the virtual environment in your home directory:
+```bash
+python3 -m venv ~/d4xx_venv
+```
+
+Activate the virtual environment and install the dependencies:
+```bash
+source ~/d4xx_venv/bin/activate
+pip install --upgrade pip
+pip install pyrealsense2 transformations pymavlink apscheduler pyserial opencv-python numpy
+```
+
+#### 2. Launching Concurrently with Robot Operations
+
+To run the proximity bridge concurrently alongside other robot processes (such as autobringup or Pixhawk MAVROS), open a separate terminal on the robot and execute:
+
+```bash
+# 1. Activate the d4xx environment
+source ~/d4xx_venv/bin/activate
+
+# 2. Navigate to the vision_to_mavros scripts directory
+cd ~/diadem_ws/src/diadem/vision_to_mavros/scripts/
+
+# 3. Launch the proximity bridge to Pixhawk
+python3 d4xx_to_mavlink.py --connect /dev/pixhawk --baudrate 115200 --debug_enable 0
+```
+
+> [!TIP]
+> **Terminal Prompt Example:**
+> ```text
+> (d4xx_venv) diadem-mini@diadem-mini:~$ source ~/d4xx_venv/bin/activate
+> (d4xx_venv) diadem-mini@diadem-mini:~$ cd ~/diadem_ws/src/diadem/vision_to_mavros/scripts/
+> (d4xx_venv) diadem-mini@diadem-mini:~/diadem_ws/src/diadem/vision_to_mavros/scripts$ python3 d4xx_to_mavlink.py --connect /dev/pixhawk --baudrate 115200 --debug_enable 0
+> ```
+
+#### Parameter Breakdown:
+- `--connect /dev/pixhawk`: Serial port connection to the Pixhawk telemetry/companion computer port.
+- `--baudrate 115200`: Baudrate matching the Pixhawk `SERIALx_BAUD` setting (typically 115200 for companion telemetry).
+- `--debug_enable 0`: Disables verbose per-frame printouts for low CPU utilization (set to `1` when testing or debugging).
+- `--camera_name D435I` *(optional)*: Explicitly matches an Intel RealSense D435i if multiple RealSense devices are connected.
+
+#### Pixhawk / ArduPilot Configuration:
+Ensure the following parameters are configured on the Pixhawk autopilot (via QGroundControl / Mission Planner):
+- `PRX_TYPE` = `2` (MAVLink)
+- `SERIALx_PROTOCOL` = `2` (MAVLink 2) on the telemetry port connected to `/dev/pixhawk`
+- `AVD_ENABLE` = `7` (to enable avoidance using proximity sensor)
+
+### 3.7 USB Ports Configuration
 
 > **IMPORTANT**: Connect the USB ports as per the following diagram:
 
 ![USB Port Connections](https://github.com/rigbetellabs/rbl_docs/blob/main/img/port_connections_1.png)
 ![USB Port Connections](https://github.com/rigbetellabs/rbl_docs/blob/main/img/port_connections_2.png)
 
-### 3.7 Get IP Address of Robot
+### 3.8 Get IP Address of Robot
 
 To find the IP address of the robot, run the following command on the robot's PC:
 
@@ -575,24 +637,24 @@ The `/wheel/vel` topic sends an array of calculated current velocities for each 
 - **Description:**  Publishes feedback on the Pixhawk control status.
 
 
-## 6. Diadem Robot Parameters
+## 6. Diadem Mini Robot Parameters
 
 The parameters for the robot can be dynamically reconfigured via rqt_reconfigure. Here are some key parameters:
 
-| Parameter                   | Value                                     |
-|-----------------------------|-------------------------------------------|
-| **Drive Type**             | Skid Steer Drive                             |
-| **Diameter**                | 0.35m                                      |
-| **Wheel Separation Width**  | 0.58m                                    |
-| **Wheel Separation Length** | 0.5 m                                    |
-| **Motor Type**              | DC Geared Motor                 |
-| **RPM**                     | 110                                       |
-| **Encoder Type**            | Magnetic Encoder                          |
-| **PPR (Pulses Per Revolution)**| 600                                      |
-| **Microcontroller**         | DOIT-ESP32 Devkit V1                      |
-| **Robot Payload Capacity**  | 200-250 kgs                                   |
-| **Battery Life**            | About 3 hours                             |
-| **Battery Type**            | Lithium-ion 193AH 6S 24V                |
+| Parameter                       | Value                    |
+| ---------------------------------| --------------------------|
+| **Drive Type**                  | Skid Steer Drive         |
+| **Diameter**                    | 0.35m                    |
+| **Wheel Separation Width**      | 0.58m                    |
+| **Wheel Separation Length**     | 0.5 m                    |
+| **Motor Type**                  | Brushless DC Motor       |
+| **RPM**                         | 110                      |
+| **Encoder Type**                | Magnetic Encoder         |
+| **PPR (Pulses Per Revolution)** | 600                      |
+| **Microcontroller**             | DOIT-ESP32 Devkit V1     |
+| **Robot Payload Capacity**      | 200-250 kgs              |
+| **Battery Life**                | About 3 hours            |
+| **Battery Type**                | Lithium-ion 193AH 6S 24V |
 
 ## 7. Diagnostic Tests
 
@@ -611,7 +673,7 @@ The diagnostic tests are a set of procedures to ensure the proper functionality 
 Here is how you can perform a detailed diagnostic:
 
 ```bash
-cd ~/ros2_ws/src/diadem/diadem_firmware/scripts
+cd ~/diadem_ws/src/diadem/diadem_firmware/scripts
 python3 diadem_diagnostics.py
 ```
 
@@ -632,7 +694,7 @@ The diagnostics.py script will perform several checks:
 - Monitor the battery status to prevent running diagnostics on a low battery.
 - If any tests fail, refer to the error logs for more information.
 
-By following these instructions, you can perform diagnostic tests on the diadem robot to identify and resolve any issues with its components.
+By following these instructions, you can perform diagnostic tests on the Diadem Mini robot to identify and resolve any issues with its components.
 
 ## 8. Charging Instructions
 

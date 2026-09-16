@@ -39,11 +39,28 @@ class ScanFilterNode(Node):
         self.declare_parameter('jump_thresh',      0.15)   # m — strict one-sided jump
         self.declare_parameter('min_cluster_rays', 25)     # min consecutive valid rays to keep
 
+        # Chassis deadzone parameters (box around robot footprint)
+        self.declare_parameter('chassis_x_min',    -0.45)  # m (rear)
+        self.declare_parameter('chassis_x_max',     0.45)  # m (front)
+        self.declare_parameter('chassis_y_min',    -0.45)  # m (right)
+        self.declare_parameter('chassis_y_max',     0.45)  # m (left)
+        self.declare_parameter('chassis_radius',    0.0)   # m (optional radial deadzone)
+        self.declare_parameter('lidar_offset_x',    0.0)   # m (lidar X relative to base_link)
+        self.declare_parameter('lidar_offset_y',    0.0)   # m (lidar Y relative to base_link)
+
         self.range_min        = self.get_parameter('range_min').value
         self.range_max        = self.get_parameter('range_max').value
         self.jump_window      = self.get_parameter('jump_window').value
         self.jump_thresh      = self.get_parameter('jump_thresh').value
         self.min_cluster_rays = self.get_parameter('min_cluster_rays').value
+
+        self.chassis_x_min    = self.get_parameter('chassis_x_min').value
+        self.chassis_x_max    = self.get_parameter('chassis_x_max').value
+        self.chassis_y_min    = self.get_parameter('chassis_y_min').value
+        self.chassis_y_max    = self.get_parameter('chassis_y_max').value
+        self.chassis_radius   = self.get_parameter('chassis_radius').value
+        self.lidar_offset_x   = self.get_parameter('lidar_offset_x').value
+        self.lidar_offset_y   = self.get_parameter('lidar_offset_y').value
 
         self.sub = self.create_subscription(
             LaserScan, '/scan', self.callback, qos_profile_sensor_data)
@@ -53,6 +70,8 @@ class ScanFilterNode(Node):
         self._call_count = 0
         self.get_logger().info(
             f'ScanFilter | range=[{self.range_min},{self.range_max}]m  '
+            f'deadzone_x=[{self.chassis_x_min},{self.chassis_x_max}]m  '
+            f'deadzone_y=[{self.chassis_y_min},{self.chassis_y_max}]m  '
             f'jump_thresh={self.jump_thresh}m  '
             f'min_cluster={self.min_cluster_rays}rays'
         )
@@ -68,7 +87,25 @@ class ScanFilterNode(Node):
             ranges, np.inf
         )
 
-        # === Stage 2: One-sided jump filter ===
+        # === Stage 2: Robot Chassis Deadzone (Rectangular Box & Optional Radius) ===
+        finite_idx = np.where(np.isfinite(ranges))[0]
+        if len(finite_idx) > 0:
+            angles = msg.angle_min + finite_idx * msg.angle_increment
+            r_fin = ranges[finite_idx]
+            xs = r_fin * np.cos(angles) + self.lidar_offset_x
+            ys = r_fin * np.sin(angles) + self.lidar_offset_y
+
+            in_chassis = (
+                (xs >= self.chassis_x_min) & (xs <= self.chassis_x_max) &
+                (ys >= self.chassis_y_min) & (ys <= self.chassis_y_max)
+            )
+            if self.chassis_radius > 0.0:
+                in_chassis |= (r_fin < self.chassis_radius)
+
+            deadzone_indices = finite_idx[in_chassis]
+            ranges[deadzone_indices] = np.inf
+
+        # === Stage 3: One-sided jump filter ===
         # A point is removed if it jumps by more than jump_thresh from
         # the median of EITHER its left window OR its right window.
         w = self.jump_window
@@ -94,7 +131,7 @@ class ScanFilterNode(Node):
             if left_jump > self.jump_thresh or right_jump > self.jump_thresh:
                 after_jump[i] = np.inf
 
-        # === Stage 3: Connected-component pruning ===
+        # === Stage 4: Connected-component pruning ===
         # Find runs of consecutive finite values and drop short ones.
         filtered = after_jump.copy()
         i = 0

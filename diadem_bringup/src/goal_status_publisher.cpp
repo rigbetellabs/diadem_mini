@@ -16,7 +16,7 @@ public:
 
         // Define publisher
 
-        goal_status_pub_ = this->create_publisher<std_msgs::msg::Int32>("robot/nav_status", 10);
+        goal_status_pub_ = this->create_publisher<std_msgs::msg::Int32>("/nav_status", 10);
 
         // Define subscription
 

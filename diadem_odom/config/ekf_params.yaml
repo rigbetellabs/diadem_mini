@@ -16,7 +16,7 @@ ekf_filter_node:
 
         transform_timeout: 0.0 # gets latest tf, non blocking
 
-        publish_tf: true # carto
+        publish_tf: false # Disabled so Cartographer / AMCL handles TF exclusively
         #publish_tf: true # gmapping
 
         publish_acceleration: false # pubs filtered_imu
